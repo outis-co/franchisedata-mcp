@@ -1,0 +1,37 @@
+{
+  "name": "@outis-co/franchisedata-mcp",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) server for franchisedata.io commercial intelligence (500 US chains, FDD Item 19, POS hardware fingerprints, and multi-unit franchisee ownership).",
+  "main": "index.js",
+  "bin": {
+    "franchisedata-mcp": "./bin/mcp.js"
+  },
+  "scripts": {
+    "start": "node bin/mcp.js",
+    "test": "node bin/mcp.js --version"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "cursor",
+    "ai-agents",
+    "franchisedata",
+    "fdd-item-19",
+    "restaurant-intelligence",
+    "pos-detection"
+  ],
+  "author": "Outis Co (https://franchisedata.io)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/outis-co/franchisedata-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/outis-co/franchisedata-mcp/issues"
+  },
+  "homepage": "https://franchisedata.io",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,19 @@
+# Smithery MCP Server Configuration
+# https://smithery.ai/docs/config
+startCommand:
+  type: stdio
+configSchema:
+  type: object
+  properties:
+    FRANCHISE_API_KEY:
+      type: string
+      title: "Franchise API Key"
+      description: "Optional FranchiseData Pro API key for institutional unmasking"
+commandFunction: |-
+  (config) => ({
+    command: 'node',
+    args: ['bin/mcp.js'],
+    env: config.FRANCHISE_API_KEY ? { FRANCHISE_API_KEY: config.FRANCHISE_API_KEY } : {}
+  })
+exampleConfig:
+  FRANCHISE_API_KEY: ""
