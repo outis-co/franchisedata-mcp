@@ -2,6 +2,7 @@
 
 [![npm version](https://img.shields.io/badge/npm-v1.0.0-blue)](https://www.npmjs.com/package/@outis-co/franchisedata-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Glama](https://glama.ai/mcp/servers/outis-co/franchisedata-mcp/badges/score.svg)](https://glama.ai/mcp/servers/outis-co/franchisedata-mcp)
 [![MCP Tools](https://img.shields.io/badge/MCP-17%20Tools-purple)](https://franchisedata.io/api/mcp)
 [![Chains](https://img.shields.io/badge/Chains-500%20US%20Chains-emerald)](https://franchisedata.io/brands)
 [![Locations](https://img.shields.io/badge/Locations-210%2C484%20Verified-blue)](https://franchisedata.io)
