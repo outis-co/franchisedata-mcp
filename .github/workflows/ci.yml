@@ -14,4 +14,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm test
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build MCP server
+        run: npm run build
+      - name: Run unit test suite
+        run: npm test
+      - name: Verify zero author identity leak
+        run: |
+          AUTHOR=$(git log -1 --pretty=format:'%ae')
+          echo "Commit author email: $AUTHOR"
+          if [[ "$AUTHOR" != *"@franchisedata.io"* && "$AUTHOR" != *"users.noreply.github.com"* ]]; then
+            echo "Error: Commit author email '$AUTHOR' does not match organization domain."
+            exit 1
+          fi
