@@ -7,12 +7,20 @@
  */
 
 const readline = require("readline");
+const path = require("path");
 
 const API_ENDPOINT = process.env.FRANCHISE_API_URL || "https://franchisedata.io/api/mcp";
 const API_KEY = process.env.FRANCHISE_API_KEY || "";
 
+let localTools = null;
+try {
+  localTools = require(path.join(__dirname, "../lib/tools.json"));
+} catch (e) {
+  // If tools.json is absent, fallback to remote fetch
+}
+
 if (process.argv.includes("--version") || process.argv.includes("-v")) {
-  console.log("franchisedata-mcp v1.0.0");
+  console.log("franchisedata-mcp v1.0.1");
   process.exit(0);
 }
 
@@ -57,9 +65,43 @@ rl.on("line", async (line) => {
   try {
     const jsonRpcRequest = JSON.parse(trimmed);
 
+    // Fast-path local handling for introspection checks
+    if (jsonRpcRequest.method === "initialize") {
+      const response = {
+        jsonrpc: "2.0",
+        id: jsonRpcRequest.id,
+        result: {
+          protocolVersion: jsonRpcRequest.params?.protocolVersion || "2024-11-05",
+          capabilities: {
+            tools: {
+              listChanged: false
+            }
+          },
+          serverInfo: {
+            name: "franchisedata.io",
+            version: "1.0.1"
+          }
+        }
+      };
+      process.stdout.write(JSON.stringify(response) + "\n");
+      return;
+    }
+
+    if (jsonRpcRequest.method === "tools/list" && localTools && localTools.length > 0) {
+      const response = {
+        jsonrpc: "2.0",
+        id: jsonRpcRequest.id,
+        result: {
+          tools: localTools
+        }
+      };
+      process.stdout.write(JSON.stringify(response) + "\n");
+      return;
+    }
+
     const headers = {
       "Content-Type": "application/json",
-      "User-Agent": "franchisedata-mcp/1.0.0",
+      "User-Agent": "franchisedata-mcp/1.0.1",
     };
     if (API_KEY) {
       headers["Authorization"] = `Bearer ${API_KEY}`;

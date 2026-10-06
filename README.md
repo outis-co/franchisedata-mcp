@@ -1,6 +1,6 @@
 # @outis-co/franchisedata-mcp
 
-[![npm version](https://img.shields.io/badge/npm-v1.0.0-blue)](https://www.npmjs.com/package/@outis-co/franchisedata-mcp)
+[![npm version](https://img.shields.io/badge/npm-v1.0.1-blue)](https://www.npmjs.com/package/@outis-co/franchisedata-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Glama](https://glama.ai/mcp/servers/outis-co/franchisedata-mcp/badges/score.svg)](https://glama.ai/mcp/servers/outis-co/franchisedata-mcp)
 [![MCP Tools](https://img.shields.io/badge/MCP-17%20Tools-purple)](https://franchisedata.io/api/mcp)
@@ -59,27 +59,29 @@ In Cursor Settings -> Features -> MCP Servers -> Add New MCP Server:
 
 ---
 
-## 🛠️ Registered MCP Tools (17 Tools)
+## 🛠️ Registered MCP Tools (17 Grade A Tools)
+
+Every tool provides full input validation, typed `outputSchema`, MCP behavioral annotations (`readOnlyHint`, `idempotentHint`), and explicit disambiguation boundaries (`WHEN TO USE` / `WHEN NOT TO USE` / `ALTERNATIVES`).
 
 | Tool Name | Type | Description |
 | :--- | :--- | :--- |
-| `search_brands` | FREE | Search all 500 indexed chains by category and pricing. |
-| `describe_endpoint` | FREE | Schema and parameter documentation for any endpoint. |
-| `check_balance` | FREE | Check remaining credit balance on an API key. |
-| `topup_credits` | FREE | Mint a new API key or top up prepaid credits. |
-| `mcdonalds_locations` | PAID ($0.003) | Fast lookup of McDonald's stores with drive-thru filters. |
-| `starbucks_store_status` | PAID ($0.002) | Real-time operating hours and open/closed status. |
-| `franchise_search_near` | PAID ($0.005) | Radial cross-brand search for open restaurant locations. |
-| `detect_tech_stack` | PAID ($0.003) | Fingerprint POS (Toast, Aloha, Brink), KDS, and ordering gateways. |
-| `get_operator_intelligence`| PAID ($0.005) | Multi-unit franchisee holding LLCs, executives, and unit counts. |
-| `get_fdd_item19` | PAID ($0.010) | Statutory Item 19 AUV quartiles, royalty fee %, and investment. |
-| `get_menu_pricing` | PAID ($0.003) | Local item pricing, national benchmarks, and price variance. |
-| `track_brand_changes` | PAID ($0.003) | Real-time store openings, closures, and fleet relocations. |
-| `get_local_share_of_choice`| PAID ($0.005) | Hyperlocal digital shelf observations (DoorDash, Uber Eats). |
-| `get_weekly_scorecard` | PAID ($0.010) | 6-Question Weekly Operating Review Scorecard for a store. |
-| `recommend_local_action` | PAID ($0.005) | Margin-guardrailed tactical local actions with matched holdout. |
-| `semantic_vector_search` | PAID ($0.005) | pgvector semantic embeddings search across operators and menus. |
-| `fetch_franchise_data` | Universal | Universal runner calling any REST endpoint with typed parameters. |
+| `search_brands` | FREE | Search all 500 indexed chains by category and pricing. Disambiguated from vector search. |
+| `describe_endpoint` | FREE | Schema, parameter documentation, and HTTP methods for any API endpoint. |
+| `check_balance` | FREE | Read-only check of remaining credit balance in USD and micro-USD. |
+| `topup_credits` | State-Mutating | Mint a new API key ($1.00 min) or top up prepaid credits for an existing key. |
+| `mcdonalds_locations` | PAID ($0.003) | Fast lookup of McDonald's stores with drive-thru, 24h, and mobile order filters. |
+| `starbucks_store_status` | PAID ($0.002) | Real-time operating hours, active open/closed status, and store features. |
+| `franchise_search_near` | PAID ($0.005) | Radial cross-brand coordinate search (up to 50 km) for open restaurant locations. |
+| `detect_tech_stack` | PAID ($0.003) | Fingerprint POS (Toast, Aloha, Brink), KDS, and online ordering gateways. |
+| `get_operator_intelligence`| PAID ($0.005) | Multi-unit franchisee holding LLCs, executive leadership, and store fleet counts. |
+| `get_fdd_item19` | PAID ($0.010) | Statutory Item 19 AUV quartiles, royalty fee %, and initial investment ranges. |
+| `get_menu_pricing` | PAID ($0.003) | Localized menu item pricing, national benchmarks, and price variance analysis. |
+| `track_brand_changes` | PAID ($0.003) | Real-time audit log of store openings, permanent closures, and fleet relocations. |
+| `get_local_share_of_choice`| PAID ($0.005) | Hyperlocal digital shelf observations across DoorDash, Uber Eats, and 1P web. |
+| `get_weekly_scorecard` | PAID ($0.010) | Standardized 6-Question Weekly Operating Review Scorecard for store diagnostics. |
+| `recommend_local_action` | PAID ($0.005) | Single controllable, margin-guardrailed tactical intervention with holdout test design. |
+| `semantic_vector_search` | PAID ($0.005) | pgvector cosine similarity search across multi-unit operators and menu items. |
+| `fetch_franchise_data` | Universal Fallback | Parameterized universal runner calling any REST endpoint when dedicated tool does not exist. |
 
 ---
 

@@ -1,11 +1,20 @@
 {
   "name": "@outis-co/franchisedata-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Model Context Protocol (MCP) server for franchisedata.io commercial intelligence (500 US chains, FDD Item 19, POS hardware fingerprints, and multi-unit franchisee ownership).",
   "main": "index.js",
   "bin": {
     "franchisedata-mcp": "./bin/mcp.js"
   },
+  "files": [
+    "bin",
+    "lib",
+    "index.js",
+    "README.md",
+    "LICENSE",
+    "glama.json",
+    "smithery.yaml"
+  ],
   "scripts": {
     "start": "node bin/mcp.js",
     "test": "node bin/mcp.js --version"

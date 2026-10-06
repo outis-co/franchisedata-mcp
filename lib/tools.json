@@ -1,0 +1,1225 @@
+[
+  {
+    "name": "search_brands",
+    "title": "Search Franchise Brands Catalog",
+    "description": "FREE. Search and discover indexed restaurant brands across the 500 US franchise database by name, concept, sector, or category. Returns matching chains with total unit counts, category classification, and per-call endpoint pricing. Read-only operation requiring no API key or balance. Rate limit: 60 req/min. WHEN TO USE: Use first when discovering brand slugs or verifying if a chain is indexed in the catalog. WHEN NOT TO USE: Do not use for physical store locations (use 'franchise_search_near' or 'mcdonalds_locations'), corporate filings (use 'get_fdd_item19'), or natural language vector searches (use 'semantic_vector_search'). ALTERNATIVES: Use 'semantic_vector_search' for conceptual similarity; use 'describe_endpoint' to inspect route pricing.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Case-insensitive search query matching brand name, category, or slug (e.g. 'burger', 'coffee', 'taco', 'subway'). If omitted, returns top brands ordered by fleet size."
+        }
+      }
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "description": "Total matching brands found"
+        },
+        "brands": {
+          "type": "array",
+          "description": "List of matching brand summaries with fleet size and API prices",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "tagline": {
+                "type": "string"
+              },
+              "total_locations": {
+                "type": "integer"
+              },
+              "price_per_call": {
+                "type": "number"
+              },
+              "website": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "total",
+        "brands"
+      ]
+    }
+  },
+  {
+    "name": "describe_endpoint",
+    "title": "Describe Endpoint Schema and Pricing",
+    "description": "FREE. Inspect technical documentation, supported query parameters, authentication methods, and per-call pricing for any REST API route on franchisedata.io. Read-only operation requiring no API key or balance. Rate limit: 60 req/min. Returns 404 if the endpoint route is unrecognized. WHEN TO USE: Use before calling 'fetch_franchise_data' to verify required query parameters, authentication headers, and per-request prices. WHEN NOT TO USE: Do not use to fetch actual brand data records; use 'fetch_franchise_data' or specialized shortcut tools instead. ALTERNATIVES: Use 'search_brands' to discover brand slugs; use 'fetch_franchise_data' to execute the request.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "description": "Target REST API path to inspect (e.g. '/api/brands/mcdonalds/locations', '/api/brands/tacobell/operators')."
+        }
+      },
+      "required": [
+        "endpoint"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "description": "Requested endpoint path"
+        },
+        "formats": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Supported response formats"
+        },
+        "supported_methods": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Supported HTTP methods"
+        },
+        "authentication": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Accepted authentication headers"
+        },
+        "pricing": {
+          "type": "string",
+          "description": "Per-request pricing description"
+        }
+      },
+      "required": [
+        "endpoint",
+        "supported_methods",
+        "pricing"
+      ]
+    }
+  },
+  {
+    "name": "check_balance",
+    "title": "Check API Credit Balance",
+    "description": "FREE. Query the remaining prepaid credit balance (in USD and micro-USD) and active status for a FranchiseData Pro API key. Read-only operation requiring an API key passed via 'api_key' argument or 'Authorization: Bearer fc_live_...' header. Returns 400 if key is omitted, or 401 if key is invalid. WHEN TO USE: Use before executing batch paid queries to verify sufficient funds remain. WHEN NOT TO USE: Do not use for minting new keys or topping up funds; use 'topup_credits' instead. ALTERNATIVES: Use 'topup_credits' to deposit credits or create new credentials.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "api_key": {
+          "type": "string",
+          "description": "Optional if Authorization HTTP header is set. The 'fc_live_...' API key to inspect."
+        }
+      }
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "key_prefix": {
+          "type": "string",
+          "description": "Public key prefix (e.g. 'fc_live_7321...')"
+        },
+        "balance_usd": {
+          "type": "string",
+          "description": "Formatted USD balance (e.g. '$4.50')"
+        },
+        "balance_micro": {
+          "type": "integer",
+          "description": "Balance in micro-USD (1 USD = 1,000,000 micro)"
+        },
+        "is_active": {
+          "type": "boolean",
+          "description": "Whether the API key is active"
+        }
+      },
+      "required": [
+        "balance_usd",
+        "balance_micro",
+        "is_active"
+      ]
+    }
+  },
+  {
+    "name": "topup_credits",
+    "title": "Mint API Key or Top Up Prepaid Credits",
+    "description": "Deposit prepaid credits into an existing API key or mint a new key ($1.00 USD minimum, $500.00 max). State-mutating operation that creates or updates database credentials. Requires no prior authentication. Pass 'api_key' to top up an existing key, or omit 'api_key' to mint a fresh key. Returns generated or updated key details and balance in USD. WHEN TO USE: Use when an existing key has exhausted credits, or when a new agent session requires dedicated credentials. WHEN NOT TO USE: Do not use solely to inspect an existing balance without depositing funds; use 'check_balance' instead. ALTERNATIVES: Use 'check_balance' for read-only balance verification without adding credits.",
+    "annotations": {
+      "readOnlyHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "amount_usd": {
+          "type": "number",
+          "description": "Amount to deposit in USD (minimum 1.00, maximum 500.00, e.g. 5.00)."
+        },
+        "api_key": {
+          "type": "string",
+          "description": "Optional existing 'fc_live_...' key to top up. If omitted, mints and returns a fresh API key."
+        }
+      },
+      "required": [
+        "amount_usd"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "The newly minted API key (only present when creating a new key)"
+        },
+        "success": {
+          "type": "boolean",
+          "description": "Whether the credit top-up succeeded"
+        },
+        "message": {
+          "type": "string",
+          "description": "Status confirmation message"
+        },
+        "balance_usd": {
+          "type": "string",
+          "description": "Updated credit balance in USD"
+        }
+      },
+      "required": [
+        "message",
+        "balance_usd"
+      ]
+    }
+  },
+  {
+    "name": "fetch_franchise_data",
+    "title": "Universal Franchise REST Endpoint Runner",
+    "description": "PAID ($0.002 - $0.005). Execute parameterized REST queries against any franchisedata.io API endpoint with typed arguments. Atomically debits balance per request. Requires 'fc_live_...' API key with sufficient balance. Returns 402 if balance is insufficient. WHEN TO USE: Use ONLY as an escape hatch for arbitrary or custom REST routes not covered by typed shortcut tools. WHEN NOT TO USE: Do not use when a dedicated typed tool exists (e.g. use 'get_fdd_item19' for FDD unit economics, 'detect_tech_stack' for POS hardware, 'get_operator_intelligence' for ownership trees, 'mcdonalds_locations' for McDonald's stores). ALTERNATIVES: Use 'describe_endpoint' first to verify route parameters; use specialized shortcuts for validated schemas.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "API endpoint route path (e.g. '/api/brands/mcdonalds/locations', '/api/brands/wendys/store/101/status')."
+        },
+        "params": {
+          "type": "object",
+          "description": "Key-value map of URL query parameters (e.g. { 'state': 'CA', 'drive_thru': 'true', 'limit': 10 })."
+        },
+        "api_key": {
+          "type": "string",
+          "description": "Optional if Authorization header is set. Your 'fc_live_...' API key."
+        }
+      },
+      "required": [
+        "path"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "description": "Target REST endpoint path executed"
+        },
+        "data": {
+          "type": "array",
+          "description": "Array of returned record rows from the database"
+        },
+        "balance_remaining_usd": {
+          "type": "string",
+          "description": "Remaining API credit balance in USD"
+        }
+      },
+      "required": [
+        "endpoint",
+        "data",
+        "balance_remaining_usd"
+      ]
+    }
+  },
+  {
+    "name": "mcdonalds_locations",
+    "title": "Query McDonald's Store Locations",
+    "description": "PAID ($0.003). Dedicated fast search for McDonald's fleet stores filtered by city, state, postal zip code, and drive-thru availability. Atomically debits $0.003 from prepaid balance. Requires 'fc_live_...' API key. Returns 402 if balance is insufficient. WHEN TO USE: Use specifically when looking up McDonald's store locations and filtering for drive-thru lanes. WHEN NOT TO USE: Do not use for other chains or cross-brand searches; use 'franchise_search_near' instead. ALTERNATIVES: Use 'franchise_search_near' for coordinate-based cross-brand proximity search; use 'search_brands' to discover other chains.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "city": {
+          "type": "string",
+          "description": "City name to filter stores by (e.g. 'Chicago', 'Dallas')"
+        },
+        "state": {
+          "type": "string",
+          "description": "Two-letter US state postal code (e.g. 'IL', 'TX', 'CA')"
+        },
+        "zip": {
+          "type": "string",
+          "description": "Five-digit US postal ZIP code (e.g. '60601')"
+        },
+        "drive_thru": {
+          "type": "boolean",
+          "description": "Filter exclusively for stores with verified drive-thru lanes"
+        },
+        "limit": {
+          "type": "number",
+          "description": "Maximum number of store records to return (default 25, max 50)"
+        }
+      }
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "string",
+          "description": "Brand name ('McDonald\\'s')"
+        },
+        "count": {
+          "type": "integer",
+          "description": "Number of matching locations found"
+        },
+        "balance_remaining_usd": {
+          "type": "string",
+          "description": "Remaining API credit balance in USD"
+        },
+        "locations": {
+          "type": "array",
+          "description": "List of McDonald's store records matching filters",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "store_number": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "zip": {
+                "type": "string"
+              },
+              "latitude": {
+                "type": "number"
+              },
+              "longitude": {
+                "type": "number"
+              },
+              "has_drive_thru": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "brand",
+        "count",
+        "balance_remaining_usd",
+        "locations"
+      ]
+    }
+  },
+  {
+    "name": "starbucks_store_status",
+    "title": "Real-Time Starbucks Operating Status",
+    "description": "PAID ($0.002). Retrieve live operating status, weekly schedule, and current open/closed state for a specific Starbucks store. Atomically debits $0.002 from prepaid balance. Requires 'fc_live_...' API key. If 'store_id' is omitted, defaults to the first indexed store. Returns 404 if store is not found, 402 if balance insufficient. WHEN TO USE: Use to verify whether an individual Starbucks store is currently open or to view its operating schedule. WHEN NOT TO USE: Do not use for fleet-wide location discovery (use 'franchise_search_near' or 'fetch_franchise_data'). ALTERNATIVES: Use 'franchise_search_near' for finding open stores near coordinates; use 'track_brand_changes' for permanent closures.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "store_id": {
+          "type": "string",
+          "description": "Optional Starbucks store identifier or store number (e.g. '1033083', 'loc_starbucks_1033083'). If omitted, inspects the first indexed store."
+        }
+      }
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "store_number": {
+          "type": "string",
+          "description": "Store identifier number"
+        },
+        "name": {
+          "type": "string",
+          "description": "Store location name"
+        },
+        "address": {
+          "type": "string",
+          "description": "Street address"
+        },
+        "city": {
+          "type": "string",
+          "description": "City"
+        },
+        "state": {
+          "type": "string",
+          "description": "State postal abbreviation"
+        },
+        "status": {
+          "type": "string",
+          "description": "Current operating status ('Open' or 'Closed')"
+        },
+        "hours": {
+          "type": "object",
+          "description": "Weekly operating hours by daypart and weekday"
+        },
+        "balance_remaining_usd": {
+          "type": "string",
+          "description": "Remaining API credit balance in USD"
+        }
+      },
+      "required": [
+        "store_number",
+        "status",
+        "balance_remaining_usd"
+      ]
+    }
+  },
+  {
+    "name": "franchise_search_near",
+    "title": "Radial Cross-Brand Location Proximity Search",
+    "description": "PAID ($0.005). Radial coordinate-based proximity search (up to 50 miles) across all 500 US restaurant franchise chains. Returns geocoded locations, distance, and brand classification. Atomically debits $0.005 from prepaid balance. Requires 'fc_live_...' API key. Returns 402 if balance is insufficient. WHEN TO USE: Use for geographic competitive landscape queries, local market density analysis, and finding nearby restaurants across multiple brands. WHEN NOT TO USE: Do not use for single-brand McDonald's lookups by city/zip (use 'mcdonalds_locations') or brand catalog metadata (use 'search_brands'). ALTERNATIVES: Use 'mcdonalds_locations' for dedicated McDonald's filters; use 'get_local_share_of_choice' for delivery shelf share.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "lat": {
+          "type": "number",
+          "description": "Center latitude coordinate in decimal degrees (e.g. 41.8781)"
+        },
+        "lng": {
+          "type": "number",
+          "description": "Center longitude coordinate in decimal degrees (e.g. -87.6298)"
+        },
+        "radius_miles": {
+          "type": "number",
+          "description": "Search radius in statute miles (default 10, max 50)"
+        },
+        "category": {
+          "type": "string",
+          "description": "Optional category filter (e.g. 'Burger', 'Coffee', 'Pizza', 'Chicken')"
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "center": {
+          "type": "object",
+          "properties": {
+            "lat": {
+              "type": "number"
+            },
+            "lng": {
+              "type": "number"
+            },
+            "radius": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "lat",
+            "lng",
+            "radius"
+          ]
+        },
+        "results": {
+          "type": "array",
+          "description": "List of nearby restaurant store records across indexed brands",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "brand_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "latitude": {
+                "type": "number"
+              },
+              "longitude": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "balance_remaining_usd": {
+          "type": "string",
+          "description": "Remaining API credit balance in USD"
+        }
+      },
+      "required": [
+        "center",
+        "results",
+        "balance_remaining_usd"
+      ]
+    }
+  },
+  {
+    "name": "get_operator_intelligence",
+    "title": "Multi-Unit Franchisee Ownership Intelligence",
+    "description": "PAID ($0.005). Retrieve corporate franchisee entity trees, operating LLCs, portfolio unit counts, and executive leadership contacts. Requires either 'operator_id' OR both 'brand' and 'store_id'. Atomically debits $0.005. Requires 'fc_live_...' API key. Returns 402 if balance insufficient. WHEN TO USE: Use to identify who owns and operates a franchise location (e.g. Flynn Group, Carrols), examine multi-unit consolidation, and find franchisee executive contacts. WHEN NOT TO USE: Do not use for corporate franchisor FDD financial benchmarks (use 'get_fdd_item19') or in-store hardware (use 'detect_tech_stack'). ALTERNATIVES: Use 'get_fdd_item19' for statutory Item 19 disclosures; use 'semantic_vector_search' to find operators by fuzzy concept.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operator_id": {
+          "type": "string",
+          "description": "Direct operator entity ID (e.g. 'op_flynn_group'). Provide this OR provide both 'brand' and 'store_id'."
+        },
+        "brand": {
+          "type": "string",
+          "description": "Canonical brand slug (e.g. 'tacobell', 'applebees', 'wendys'). Used when querying by store."
+        },
+        "store_id": {
+          "type": "string",
+          "description": "Store ID (e.g. 'loc_tacobell_1001') to look up controlling franchisee."
+        }
+      }
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "operator": {
+          "type": "object",
+          "description": "Full operator profile when queried by operator_id",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "legal_name": {
+              "type": "string"
+            },
+            "dba_name": {
+              "type": "string"
+            },
+            "headquarters": {
+              "type": "string"
+            },
+            "total_units": {
+              "type": "integer"
+            },
+            "annual_revenue_usd": {
+              "type": "number"
+            }
+          }
+        },
+        "operators": {
+          "type": "array",
+          "description": "List of operator associations when queried by brand/store",
+          "items": {
+            "type": "object",
+            "properties": {
+              "operator_id": {
+                "type": "string"
+              },
+              "legal_name": {
+                "type": "string"
+              },
+              "dba_name": {
+                "type": "string"
+              },
+              "headquarters": {
+                "type": "string"
+              },
+              "contact_role": {
+                "type": "string"
+              },
+              "total_units": {
+                "type": "integer"
+              },
+              "annual_revenue_usd": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "balance_remaining_usd": {
+          "type": "string",
+          "description": "Remaining API credit balance in USD"
+        }
+      },
+      "required": [
+        "balance_remaining_usd"
+      ]
+    }
+  },
+  {
+    "name": "detect_tech_stack",
+    "title": "Detect In-Store POS and Kitchen Tech Stack",
+    "description": "PAID ($0.003). Fingerprint point-of-sale (POS) hardware (Toast, NCR Aloha, Brink, Micros, Square), kitchen display systems (KDS), and online ordering gateways for a store location. Atomically debits $0.003. Requires 'fc_live_...' API key. Returns 402 if balance insufficient. WHEN TO USE: Use for restaurant tech competitive auditing, vendor market share tracking, and POS displacement prospecting. WHEN NOT TO USE: Do not use for menu item prices (use 'get_menu_pricing') or store status (use 'starbucks_store_status'). ALTERNATIVES: Use 'get_menu_pricing' for item prices; use 'get_operator_intelligence' for franchisee ownership.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "string",
+          "description": "Canonical brand slug (e.g. 'chickfila', 'sweetgreen', 'subway', 'mcdonalds')"
+        },
+        "store_id": {
+          "type": "string",
+          "description": "Unique store number or store ID (e.g. 'loc_subway_1001')"
+        }
+      },
+      "required": [
+        "brand",
+        "store_id"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "tech_stack": {
+          "type": "object",
+          "description": "Fingerprinted technology components for the location",
+          "properties": {
+            "store_id": {
+              "type": "string"
+            },
+            "brand_id": {
+              "type": "string"
+            },
+            "pos_provider": {
+              "type": "string"
+            },
+            "pos_confidence": {
+              "type": "number"
+            },
+            "online_ordering_gateway": {
+              "type": "string"
+            },
+            "kds_system": {
+              "type": "string"
+            },
+            "hardware_terminal_model": {
+              "type": "string"
+            }
+          }
+        },
+        "balance_remaining_usd": {
+          "type": "string",
+          "description": "Remaining API credit balance in USD"
+        }
+      },
+      "required": [
+        "balance_remaining_usd"
+      ]
+    }
+  },
+  {
+    "name": "track_brand_changes",
+    "title": "Track Fleet Openings, Closures, and Relocations",
+    "description": "PAID ($0.003). Audit recent fleet events including permanent closures, new unit openings, and relocations for a brand. Atomically debits $0.003. Requires 'fc_live_...' API key. Returns 402 if balance insufficient. WHEN TO USE: Use for tracking brand footprint expansion, net unit growth velocity, and distress/closure detection. WHEN NOT TO USE: Do not use for real-time daily operating hours (use 'starbucks_store_status'). ALTERNATIVES: Use 'starbucks_store_status' for live store hours; use 'franchise_search_near' for current open units.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "string",
+          "description": "Canonical brand slug (e.g. 'subway', 'boston-market', 'hardees', 'starbucks')"
+        },
+        "event_type": {
+          "type": "string",
+          "enum": [
+            "opening",
+            "closure",
+            "relocation"
+          ],
+          "description": "Optional event filter: 'opening', 'closure', or 'relocation'"
+        }
+      },
+      "required": [
+        "brand"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "string",
+          "description": "Brand slug queried"
+        },
+        "changes": {
+          "type": "array",
+          "description": "List of recent store opening, closure, or relocation events",
+          "items": {
+            "type": "object",
+            "properties": {
+              "store_id": {
+                "type": "string"
+              },
+              "brand_id": {
+                "type": "string"
+              },
+              "event_type": {
+                "type": "string"
+              },
+              "effective_date": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "balance_remaining_usd": {
+          "type": "string",
+          "description": "Remaining API credit balance in USD"
+        }
+      },
+      "required": [
+        "brand",
+        "changes",
+        "balance_remaining_usd"
+      ]
+    }
+  },
+  {
+    "name": "get_menu_pricing",
+    "title": "Retrieve Store Menu Pricing and Price Variance",
+    "description": "PAID ($0.003). Extract localized menu item prices, benchmark variances against national averages, and identify delivery aggregator price markups. Atomically debits $0.003. Requires 'fc_live_...' API key. Returns 402 if balance insufficient. WHEN TO USE: Use for local pricing strategy audits, inflation index tracking, and menu margin variance analysis. WHEN NOT TO USE: Do not use for delivery shelf placement rankings (use 'get_local_share_of_choice'). ALTERNATIVES: Use 'get_local_share_of_choice' for DoorDash/UberEats basket comparisons; use 'get_fdd_item19' for national revenue benchmarks.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "string",
+          "description": "Canonical brand slug (e.g. 'mcdonalds', 'chipotle', 'subway')"
+        },
+        "store_id": {
+          "type": "string",
+          "description": "Store ID or store number to query localized prices for (e.g. 'loc_mcdonalds_1001')"
+        }
+      },
+      "required": [
+        "brand",
+        "store_id"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "store_id": {
+          "type": "string",
+          "description": "Store identifier"
+        },
+        "brand": {
+          "type": "string",
+          "description": "Brand slug"
+        },
+        "items": {
+          "type": "array",
+          "description": "List of localized menu items with pricing and national variance",
+          "items": {
+            "type": "object",
+            "properties": {
+              "item_name": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "price_usd": {
+                "type": "number"
+              },
+              "national_baseline_usd": {
+                "type": "number"
+              },
+              "variance_pct": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "balance_remaining_usd": {
+          "type": "string",
+          "description": "Remaining API credit balance in USD"
+        }
+      },
+      "required": [
+        "store_id",
+        "brand",
+        "items",
+        "balance_remaining_usd"
+      ]
+    }
+  },
+  {
+    "name": "get_fdd_item19",
+    "title": "Statutory FDD Item 19 Unit Economics",
+    "description": "PAID ($0.010). Retrieve regulatory Franchise Disclosure Document (FDD) Item 19 financial disclosures: Average Unit Volume (AUV), quartile revenue tiers, royalty fee %, marketing fund %, and initial capital investment requirements. Atomically debits $0.010. Requires 'fc_live_...' API key. Returns 402 if balance insufficient. WHEN TO USE: Use for franchise investment underwriting, brand unit-level financial benchmarking, and royalty fee comparisons. WHEN NOT TO USE: Do not use for store-level weekly performance (use 'get_weekly_scorecard') or individual store pricing (use 'get_menu_pricing'). ALTERNATIVES: Use 'get_weekly_scorecard' for operational store scorecards; use 'search_brands' to discover brand catalog.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "string",
+          "description": "Canonical brand slug (e.g. 'chickfila', 'mcdonalds', 'wendys', 'culvers', 'popeyes')"
+        }
+      },
+      "required": [
+        "brand"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "string",
+          "description": "Brand slug queried"
+        },
+        "fdd_item19": {
+          "type": "object",
+          "description": "FDD Item 19 regulatory financial disclosures",
+          "properties": {
+            "brand_id": {
+              "type": "string"
+            },
+            "year": {
+              "type": "integer"
+            },
+            "auv_median": {
+              "type": "number"
+            },
+            "auv_mean": {
+              "type": "number"
+            },
+            "royalty_pct": {
+              "type": "number"
+            },
+            "ad_fund_pct": {
+              "type": "number"
+            },
+            "min_liquid_capital": {
+              "type": "number"
+            },
+            "total_investment_min": {
+              "type": "number"
+            },
+            "total_investment_max": {
+              "type": "number"
+            }
+          }
+        },
+        "balance_remaining_usd": {
+          "type": "string",
+          "description": "Remaining API credit balance in USD"
+        }
+      },
+      "required": [
+        "brand",
+        "balance_remaining_usd"
+      ]
+    }
+  },
+  {
+    "name": "get_local_share_of_choice",
+    "title": "Hyperlocal Digital Shelf Share of Choice",
+    "description": "PAID ($0.005). Query local digital shelf telemetry from DoorDash, Uber Eats, and 1st-party apps, including delivered basket price gaps, delivery ETA disparities, and organic vs sponsored placement. Atomically debits $0.005. Requires 'fc_live_...' API key. Returns 402 if balance insufficient. WHEN TO USE: Use to diagnose delivery channel share loss, competitor promotion surges, and aggregator markup disparities. WHEN NOT TO USE: Do not use for static national FDD disclosures (use 'get_fdd_item19'). ALTERNATIVES: Use 'recommend_local_action' to generate guardrailed tactical responses based on shelf telemetry; use 'get_menu_pricing' for in-store menu pricing.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "store_id": {
+          "type": "string",
+          "description": "Target store ID (e.g. 'loc_mcdonalds_1001')"
+        },
+        "platform": {
+          "type": "string",
+          "enum": [
+            "doordash",
+            "ubereats",
+            "first_party"
+          ],
+          "description": "Optional delivery platform filter: 'doordash', 'ubereats', or 'first_party'"
+        },
+        "daypart": {
+          "type": "string",
+          "enum": [
+            "lunch",
+            "dinner",
+            "late_night"
+          ],
+          "description": "Optional daypart filter: 'lunch', 'dinner', or 'late_night'"
+        }
+      },
+      "required": [
+        "store_id"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "store_id": {
+          "type": "string",
+          "description": "Target store ID"
+        },
+        "total_observations": {
+          "type": "integer",
+          "description": "Total panel observations recorded"
+        },
+        "focal_delivered_total_usd": {
+          "type": "number",
+          "description": "Delivered basket total for focal store"
+        },
+        "top_rival_delivered_total_usd": {
+          "type": "number",
+          "description": "Delivered basket total for top competitor"
+        },
+        "rival_brand": {
+          "type": "string",
+          "description": "Top rival brand slug"
+        },
+        "rival_promo_badge": {
+          "type": "string",
+          "description": "Active promotional badge of rival"
+        },
+        "observations": {
+          "type": "array",
+          "description": "List of raw digital shelf observation records"
+        },
+        "balance_remaining_usd": {
+          "type": "string",
+          "description": "Remaining API credit balance in USD"
+        }
+      },
+      "required": [
+        "store_id",
+        "total_observations",
+        "balance_remaining_usd"
+      ]
+    }
+  },
+  {
+    "name": "get_weekly_scorecard",
+    "title": "Weekly Operating Review Store Scorecard",
+    "description": "PAID ($0.010). Retrieve the standardized 6-Question Weekly Operating Review Scorecard for a restaurant location covering Funnel conversion, Drivers, Competitor Moves, Fact vs Inference, 1 Recommended Action, and Holdout design. Atomically debits $0.010. Requires 'fc_live_...' API key. If 'week' is omitted, defaults to latest evaluated week. Returns 404 if no scorecard found, 402 if balance insufficient. WHEN TO USE: Use for weekly operational store diagnostics, executive unit reviews, and root-cause sales analysis. WHEN NOT TO USE: Do not use for general location searches (use 'franchise_search_near') or brand FDD data (use 'get_fdd_item19'). ALTERNATIVES: Use 'recommend_local_action' for isolated action extraction; use 'get_local_share_of_choice' for raw delivery panel telemetry.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "store_id": {
+          "type": "string",
+          "description": "Target store ID or store number (e.g. 'loc_mcdonalds_1001')"
+        },
+        "week": {
+          "type": "string",
+          "description": "Optional week identifier in ISO format (e.g. '2026-W36'). If omitted, defaults to the most recent week."
+        }
+      },
+      "required": [
+        "store_id"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "store_id": {
+          "type": "string",
+          "description": "Store identifier"
+        },
+        "week": {
+          "type": "string",
+          "description": "Evaluated week identifier"
+        },
+        "question_1_what_changed": {
+          "type": "object",
+          "description": "Funnel conversion and traffic deltas"
+        },
+        "question_2_why_did_it_change": {
+          "type": "object",
+          "description": "Driver diagnostics and decomposition"
+        },
+        "question_3_competitor_moves": {
+          "type": "object",
+          "description": "Local competitor pricing and promotional shifts"
+        },
+        "question_4_fact_vs_inference": {
+          "type": "object",
+          "description": "Separation of observed facts vs testable inferences"
+        },
+        "question_5_recommended_action": {
+          "type": "object",
+          "description": "Single controllable tactical intervention"
+        },
+        "question_6_holdout_evaluation": {
+          "type": "object",
+          "description": "Empirical holdout evaluation from prior week"
+        },
+        "balance_remaining_usd": {
+          "type": "string",
+          "description": "Remaining API credit balance in USD"
+        }
+      },
+      "required": [
+        "store_id",
+        "week",
+        "question_1_what_changed",
+        "question_5_recommended_action",
+        "balance_remaining_usd"
+      ]
+    }
+  },
+  {
+    "name": "recommend_local_action",
+    "title": "Recommend Margin-Guardrailed Local Action",
+    "description": "PAID ($0.005). Synthesize local competitor shifts and digital funnel gaps to formulate a single controllable, margin-guardrailed tactical intervention with matched holdout test design. Atomically debits $0.005. Requires 'fc_live_...' API key. Returns 404 if no scorecard exists, 402 if balance insufficient. WHEN TO USE: Use to formulate an immediate, actionable operational response to local competitive pressure with rigorous holdout controls. WHEN NOT TO USE: Do not use for broad exploratory searches (use 'franchise_search_near') or multi-unit franchisee mapping (use 'get_operator_intelligence'). ALTERNATIVES: Use 'get_weekly_scorecard' for the full 6-question review; use 'get_local_share_of_choice' for underlying delivery shelf data.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "store_id": {
+          "type": "string",
+          "description": "Target store ID to evaluate tactical recommendations for (e.g. 'loc_mcdonalds_1001')"
+        }
+      },
+      "required": [
+        "store_id"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "store_id": {
+          "type": "string",
+          "description": "Store evaluated"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status ('action_ready')"
+        },
+        "recommended_action": {
+          "type": "object",
+          "description": "Recommended tactical action details with budget and holdout",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "expected_margin_impact_pct": {
+              "type": "number"
+            },
+            "guardrail_max_budget_usd": {
+              "type": "number"
+            },
+            "holdout_store_id": {
+              "type": "string"
+            }
+          }
+        },
+        "epistemic_foundation": {
+          "type": "object",
+          "description": "Underlying facts and hypotheses",
+          "properties": {
+            "observed_facts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "testable_inferences": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "balance_remaining_usd": {
+          "type": "string",
+          "description": "Remaining API credit balance in USD"
+        }
+      },
+      "required": [
+        "store_id",
+        "status",
+        "recommended_action",
+        "balance_remaining_usd"
+      ]
+    }
+  },
+  {
+    "name": "semantic_vector_search",
+    "title": "pgvector Semantic Embeddings Search",
+    "description": "PAID ($0.005). Perform high-dimensional cosine similarity semantic vector search across multi-unit operators and menu items using embeddings. Atomically debits $0.005. Requires 'fc_live_...' API key. Type defaults to 'operators' if omitted. 'brand' parameter is only applied when type is 'menu'. Returns 402 if balance insufficient. WHEN TO USE: Use for conceptual natural language queries (e.g. 'private equity franchisee groups in Texas' or 'spicy chicken breakfast sandwich'). WHEN NOT TO USE: Do not use for exact brand catalog keyword searches (use 'search_brands') or coordinate proximity searches (use 'franchise_search_near'). ALTERNATIVES: Use 'search_brands' for keyword catalog matching; use 'get_menu_pricing' for exact store menu lookups.",
+    "annotations": {
+      "readOnlyHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Natural language query describing desired operator profile or menu concept (e.g. 'Flynn Restaurant Group Applebees', 'spicy chicken sandwich')"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "operators",
+            "menu"
+          ],
+          "description": "Vector index target: 'operators' for ownership entities (default) or 'menu' for food items"
+        },
+        "brand": {
+          "type": "string",
+          "description": "Optional canonical brand slug to constrain menu search (e.g. 'mcdonalds', 'chickfila'). Only used when type is 'menu'."
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Maximum number of nearest-neighbor results to return (default 5, max 20)"
+        }
+      },
+      "required": [
+        "query"
+      ]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Query string executed"
+        },
+        "type": {
+          "type": "string",
+          "description": "Index target searched ('operators' or 'menu')"
+        },
+        "brand": {
+          "type": "string",
+          "description": "Brand slug constraint if applied"
+        },
+        "results": {
+          "type": "array",
+          "description": "Nearest-neighbor vector search matches with similarity scores"
+        },
+        "balance_remaining_usd": {
+          "type": "string",
+          "description": "Remaining API credit balance in USD"
+        }
+      },
+      "required": [
+        "query",
+        "type",
+        "results",
+        "balance_remaining_usd"
+      ]
+    }
+  }
+]
