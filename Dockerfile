@@ -6,6 +6,7 @@ WORKDIR /app
 # Copy package files and MCP runner script
 COPY package.json index.js ./
 COPY bin/ ./bin/
+COPY lib/ ./lib/
 
 # Ensure executable permissions
 RUN chmod +x bin/mcp.js
