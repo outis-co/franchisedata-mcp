@@ -1,0 +1,32 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.franchisedata/mcp-server",
+  "description": "Official Model Context Protocol (MCP) server for franchisedata.io — 500 US restaurant franchise chains, statutory FDD Item 19 unit economics, 210,000+ store locations, POS hardware fingerprints, and multi-unit franchisee ownership trees.",
+  "version": "1.0.2",
+  "websiteUrl": "https://franchisedata.io",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@outis-co/franchisedata-mcp",
+      "version": "1.0.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "FRANCHISE_API_KEY",
+          "description": "Optional FranchiseData Pro API key (fc_live_…) for unmasking full FDD records and batch data — get one at https://franchisedata.io/topup",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true
+        }
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://franchisedata.io/mcp"
+    }
+  ]
+}
