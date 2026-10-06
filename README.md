@@ -1,6 +1,6 @@
 # @outis-co/franchisedata-mcp
 
-[![npm version](https://img.shields.io/badge/npm-v1.0.1-blue)](https://www.npmjs.com/package/@outis-co/franchisedata-mcp)
+[![npm version](https://img.shields.io/badge/npm-v1.0.2-blue)](https://www.npmjs.com/package/@outis-co/franchisedata-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Glama](https://glama.ai/mcp/servers/outis-co/franchisedata-mcp/badges/score.svg)](https://glama.ai/mcp/servers/outis-co/franchisedata-mcp)
 [![MCP Tools](https://img.shields.io/badge/MCP-17%20Tools-purple)](https://franchisedata.io/api/mcp)
