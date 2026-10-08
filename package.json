@@ -1,5 +1,5 @@
 {
-  "name": "@outis-co/franchisedata-mcp",
+  "name": "franchisedata-mcp",
   "version": "1.1.0",
   "description": "Model Context Protocol (MCP) server for franchisedata.io commercial intelligence (500 US chains, FDD Item 19, POS hardware fingerprints, and multi-unit franchisee ownership).",
   "type": "module",
@@ -34,7 +34,7 @@
     "restaurant-intelligence",
     "pos-detection"
   ],
-  "author": "Outis Co (https://franchisedata.io)",
+  "author": "FranchiseData (https://franchisedata.io)",
   "license": "MIT",
   "repository": {
     "type": "git",

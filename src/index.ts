@@ -1,5 +1,5 @@
 /**
- * @outis-co/franchisedata-mcp
+ * franchisedata-mcp
  * Enterprise-grade Model Context Protocol (MCP) server for franchisedata.io
  * 
  * Powered by @modelcontextprotocol/sdk, TypeScript, and Zod.
@@ -17,18 +17,18 @@ async function main() {
   const config = getConfig();
 
   if (process.argv.includes("--version") || process.argv.includes("-v")) {
-    console.log(`@outis-co/franchisedata-mcp v${config.version}`);
+    console.log(`franchisedata-mcp v${config.version}`);
     process.exit(0);
   }
 
   if (process.argv.includes("--help") || process.argv.includes("-h")) {
     const active = getActiveTools(config.mode);
     console.log(`
-@outis-co/franchisedata-mcp v${config.version}
+franchisedata-mcp v${config.version}
 Model Context Protocol (MCP) server for franchisedata.io commercial intelligence.
 
 USAGE:
-  npx @outis-co/franchisedata-mcp
+  npx franchisedata-mcp
 
 ENVIRONMENT VARIABLES:
   FRANCHISE_API_KEY     Optional 'fc_live_...' API key for Pro tier unmasking
@@ -47,7 +47,7 @@ CLIENT CONFIGURATION:
     "mcpServers": {
       "franchisedata": {
         "command": "npx",
-        "args": ["-y", "@outis-co/franchisedata-mcp"],
+        "args": ["-y", "franchisedata-mcp"],
         "env": {
           "FRANCHISE_API_KEY": "fc_live_your_key_here",
           "FRANCHISE_MODE": "all"

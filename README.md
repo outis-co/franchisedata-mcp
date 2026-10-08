@@ -1,6 +1,6 @@
-# @outis-co/franchisedata-mcp
+# franchisedata-mcp
 
-[![npm version](https://img.shields.io/badge/npm-v1.1.0-blue)](https://www.npmjs.com/package/@outis-co/franchisedata-mcp)
+[![npm version](https://img.shields.io/badge/npm-v1.1.0-blue)](https://www.npmjs.com/package/franchisedata-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Glama](https://glama.ai/mcp/servers/outis-co/franchisedata-mcp/badges/score.svg)](https://glama.ai/mcp/servers/outis-co/franchisedata-mcp)
 [![MCP Tools](https://img.shields.io/badge/MCP-17%20Tools-purple)](https://franchisedata.io/api/mcp)
@@ -19,7 +19,7 @@ Compatible with **Claude Desktop**, **Cursor**, **Zed**, **Cline**, and autonomo
 
 ### 1. Claude Desktop (via Smithery)
 ```bash
-npx -y @smithery/cli install @outis-co/franchisedata-mcp --client claude
+npx -y @smithery/cli install franchisedata-mcp --client claude
 ```
 
 ### 2. Claude Desktop (`claude_desktop_config.json`)
@@ -44,7 +44,7 @@ npx -y @smithery/cli install @outis-co/franchisedata-mcp --client claude
   "mcpServers": {
     "franchisedata": {
       "command": "npx",
-      "args": ["-y", "@outis-co/franchisedata-mcp"],
+      "args": ["-y", "franchisedata-mcp"],
       "env": {
         "FRANCHISE_API_KEY": "fc_live_optional_pro_key",
         "FRANCHISE_MODE": "all"
